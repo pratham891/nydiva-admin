@@ -28,21 +28,6 @@ const App = () => {
         } />
       </Routes>
     </Router>
-
-
-
-
-
-    // <Router>
-    //   <Header />
-    //   <div className="container mt-4">
-    //     <Routes>
-    //       {/* <Route path="/admin-login" element={<AdminLogin />} /> */}
-    //       <Route path="/" element={<Home />} />
-    //       <Route path="/manage-products" element={<ManageProducts />} />
-    //     </Routes>
-    //   </div>
-    // </Router>
   );
 };
 

@@ -21,7 +21,9 @@ const ManageProducts = () => {
     setFormData({ ...formData, image: file });
   };
 
-  const handleAddProduct = () => {
+
+
+  const handleAddProduct = async () => {
     if (!formData.name || !formData.price || !formData.description || !formData.image) {
       alert('All fields are required.');
       return;
@@ -35,17 +37,97 @@ const ManageProducts = () => {
       image: URL.createObjectURL(formData.image), // Temporarily set URL for preview
     };
 
-    // Simulate file storage
     const fileReader = new FileReader();
-    fileReader.onload = () => {
+    fileReader.onload = async () => {
       const imageData = fileReader.result;
-      localStorage.setItem(`product-${newProduct.id}`, imageData); // Simulate storing the image
+
+      const formDataToSend = {
+        id: uuidv4(),
+        name: formData.name,
+        price: formData.price,
+        description: formData.description,
+        images: [imageData], // Send image as base64 string in an array
+      };
+
+      try {
+        const response = await fetch('http://localhost:5000/api/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formDataToSend),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create product');
+        } else alert(`Product ${formData.name} created successfully`);
+
+        const savedProduct = await response.json();
+        setProducts([...products, savedProduct]);
+        setFormData({ name: '', price: '', description: '', image: null });
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to create product');
+      }
     };
     fileReader.readAsDataURL(formData.image);
-
-    setProducts([...products, newProduct]);
-    setFormData({ name: '', price: '', description: '', image: null });
   };
+
+
+
+
+  // const handleAddProduct = async () => {
+  //   if (!formData.name || !formData.price || !formData.description || !formData.image) {
+  //     alert('All fields are required.');
+  //     return;
+  //   }
+
+  //   const newProduct = {
+  //     id: uuidv4(),
+  //     name: formData.name,
+  //     price: parseFloat(formData.price),
+  //     description: formData.description,
+  //     image: URL.createObjectURL(formData.image), // Temporarily set URL for preview
+  //   };
+
+  //   // Simulate file storage
+  //   const fileReader = new FileReader();
+  //   fileReader.onload = async () => {
+  //     const imageData = fileReader.result;
+  //     localStorage.setItem(`product-${newProduct.id}`, imageData); // Simulate storing the image
+
+  //     // Send new product to backend API
+  //     try {
+  //       const response = await fetch('http://localhost:5000/api/products', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({
+  //           name: newProduct.name,
+  //           description: newProduct.description,
+  //           price: newProduct.price,
+  //           images: [imageData], // Assuming the backend expects an array of images
+  //         }),
+  //       });
+
+  //       if (!response.ok) {
+  //         throw new Error('Failed to create product');
+  //       }
+
+  //       const savedProduct = await response.json();
+  //       setProducts([...products, savedProduct]);
+  //       // setProducts([...products, newProduct]);
+  //       // console.log(newProduct);
+
+  //       setFormData({ name: '', price: '', description: '', image: null });
+  //     } catch (error) {
+  //       console.error('Error:', error);
+  //       alert('Failed to create product');
+  //     }
+  //   };
+  //   fileReader.readAsDataURL(formData.image);
+  // };
 
   const handleDeleteProduct = (id) => {
     const updatedProducts = products.filter((product) => product.id !== id);
@@ -53,11 +135,11 @@ const ManageProducts = () => {
   };
 
   return (
-    <div style={{ backgroundColor: 'rgb(0, 0, 0)', padding: '20px', borderRadius: '5px' }}>
+    <div style={{ backgroundColor: '#191c24', padding: '20px', borderRadius: '5px' }}>
       <h3 className="text-light">Manage Products</h3>
 
       {/* Add Product Form */}
-      <form style={{ backgroundColor: '#191c24', padding: '20px', borderRadius: '5px' }}>
+      <form style={{ backgroundColor: '#2A3038', padding: '20px', borderRadius: '5px' }}>
         <div className="mb-3">
           <label htmlFor="name" className="form-label text-light">Product Name</label>
           <input
@@ -117,7 +199,7 @@ const ManageProducts = () => {
         ) : (
           <ul className="list-group">
             {products.map((product) => (
-              <li key={product.id} className="list-group-item d-flex align-items-center" style={{ backgroundColor: '#191c24', color: '#fff' }}>
+              <li key={product.id} className="list-group-item d-flex align-items-center" style={{ backgroundColor: '#2A3038', color: '#fff' }}>
                 <img
                   src={product.image}
                   alt={product.name}
