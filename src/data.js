@@ -5,7 +5,7 @@ const fetchProducts = async () => {
     const response = await fetch('http://localhost:5000/api/products');
     const data = await response.json();
     return data.map(product => ({
-      id: product.id,
+      id: product._id,
       name: product.name,
       price: product.price,
       description: product.description,
@@ -18,5 +18,8 @@ const fetchProducts = async () => {
 };
 
 const products = await fetchProducts();
+
+console.log(products);
+
 
 export default products;

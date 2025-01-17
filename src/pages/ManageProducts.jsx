@@ -129,9 +129,30 @@ const ManageProducts = () => {
   //   fileReader.readAsDataURL(formData.image);
   // };
 
-  const handleDeleteProduct = (id) => {
-    const updatedProducts = products.filter((product) => product.id !== id);
-    setProducts(updatedProducts);
+  // const handleDeleteProduct = (id) => {
+  //   const updatedProducts = products.filter((product) => product.id !== id);
+  //   setProducts(updatedProducts);
+  // };
+
+  const handleDeleteProduct = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete product');
+      }
+
+      const result = await response.json();
+      alert(result.message);
+
+      const updatedProducts = products.filter((product) => product.id !== id);
+      setProducts(updatedProducts);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to delete product');
+    }
   };
 
   return (
