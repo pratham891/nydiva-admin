@@ -4,3 +4,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
+html body div#root nav.border-bottom.navbar.navbar-expand-lg.navbar-light.bg-dark {
+  padding: 10px;
+}
