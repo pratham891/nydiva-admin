@@ -50,7 +50,7 @@ const ManageProducts = () => {
       };
 
       try {
-        const response = await fetch('http://localhost:5000/api/products', {
+        const response = await fetch('/api/api/products', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -73,70 +73,9 @@ const ManageProducts = () => {
     fileReader.readAsDataURL(formData.image);
   };
 
-
-
-
-  // const handleAddProduct = async () => {
-  //   if (!formData.name || !formData.price || !formData.description || !formData.image) {
-  //     alert('All fields are required.');
-  //     return;
-  //   }
-
-  //   const newProduct = {
-  //     id: uuidv4(),
-  //     name: formData.name,
-  //     price: parseFloat(formData.price),
-  //     description: formData.description,
-  //     image: URL.createObjectURL(formData.image), // Temporarily set URL for preview
-  //   };
-
-  //   // Simulate file storage
-  //   const fileReader = new FileReader();
-  //   fileReader.onload = async () => {
-  //     const imageData = fileReader.result;
-  //     localStorage.setItem(`product-${newProduct.id}`, imageData); // Simulate storing the image
-
-  //     // Send new product to backend API
-  //     try {
-  //       const response = await fetch('http://localhost:5000/api/products', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({
-  //           name: newProduct.name,
-  //           description: newProduct.description,
-  //           price: newProduct.price,
-  //           images: [imageData], // Assuming the backend expects an array of images
-  //         }),
-  //       });
-
-  //       if (!response.ok) {
-  //         throw new Error('Failed to create product');
-  //       }
-
-  //       const savedProduct = await response.json();
-  //       setProducts([...products, savedProduct]);
-  //       // setProducts([...products, newProduct]);
-  //       // console.log(newProduct);
-
-  //       setFormData({ name: '', price: '', description: '', image: null });
-  //     } catch (error) {
-  //       console.error('Error:', error);
-  //       alert('Failed to create product');
-  //     }
-  //   };
-  //   fileReader.readAsDataURL(formData.image);
-  // };
-
-  // const handleDeleteProduct = (id) => {
-  //   const updatedProducts = products.filter((product) => product.id !== id);
-  //   setProducts(updatedProducts);
-  // };
-
   const handleDeleteProduct = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const response = await fetch(`/api/api/products/${id}`, {
         method: 'DELETE',
       });
 

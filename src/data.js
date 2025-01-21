@@ -1,8 +1,6 @@
-import sampleImage from './assets/products/sample.jpeg';
-
 const fetchProducts = async () => {
   try {
-    const response = await fetch('http://localhost:5000/api/products');
+    const response = await fetch('/api/api/products');
     const data = await response.json();
     return data.map(product => ({
       id: product._id,
