@@ -15,9 +15,4 @@ const fetchProducts = async () => {
   }
 };
 
-const products = await fetchProducts();
-
-console.log(products);
-
-
-export default products;
+export default fetchProducts;

@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import productsData from '../data.js';
+import fetchProducts from '../data.js';
 
 const Home = () => {
-  const [products, setProducts] = useState(productsData);
-
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    fetchProducts().then(products => {
+      setProducts(products);
+    }).catch(error => {
+      console.error('Error:', error);
+    });
+  }, []);
 
   const handleViewProduct = (product) => {
     setSelectedProduct(product);
@@ -21,7 +28,7 @@ const Home = () => {
   return (
     <div style={{ backgroundColor: 'rgb(0, 0, 0)', padding: '20px', borderRadius: '5px' }}>
       <h3 className="text-light">Product List</h3>
-      {products.length === 0 && <p className="text-light">No products available.</p>}
+      {products.length === 0 && <p className="text-light">Products Loading...</p>}
       <ul className="list-group">
         {products.map((product) => (
           <li key={product.id} className="list-group-item d-flex align-items-center" style={{ backgroundColor: '#191c24', color: '#fff' }}>

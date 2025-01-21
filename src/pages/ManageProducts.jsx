@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
-import productsData from '../data';
+import React, { useState, useEffect } from 'react';
+import fetchProducts from '../data';
 import { v4 as uuidv4 } from 'uuid';
 
 const ManageProducts = () => {
-  const [products, setProducts] = useState(productsData);
+  const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     price: '',
     description: '',
     image: null,
   });
+
+  useEffect(() => {
+    fetchProducts().then(products => {
+      setProducts(products);
+    }).catch(error => {
+      console.error('Error:', error);
+    });
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,8 +28,6 @@ const ManageProducts = () => {
     const file = e.target.files[0];
     setFormData({ ...formData, image: file });
   };
-
-
 
   const handleAddProduct = async () => {
     if (!formData.name || !formData.price || !formData.description || !formData.image) {
@@ -155,7 +161,7 @@ const ManageProducts = () => {
       <div className="mt-4">
         <h4 className="text-light">Product List</h4>
         {products.length === 0 ? (
-          <p className="text-light">No products available.</p>
+          <p className="text-light">Products Loading...</p>
         ) : (
           <ul className="list-group">
             {products.map((product) => (
