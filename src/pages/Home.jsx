@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Modal } from 'react-bootstrap';
 import fetchProducts from '../data.js';
 
@@ -6,14 +7,21 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProducts().then(products => {
-      setProducts(products);
-    }).catch(error => {
-      console.error('Error:', error);
-    });
-  }, []);
+    const token = localStorage.getItem('admin-token');
+    if (!token) {
+      alert(`Login required!`);
+      navigate('/admin-login');
+    } else {
+      fetchProducts().then(products => {
+        setProducts(products);
+      }).catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  }, [navigate]);
 
   const handleViewProduct = (product) => {
     setSelectedProduct(product);
