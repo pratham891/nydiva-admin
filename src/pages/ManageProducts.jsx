@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import fetchProducts from '../data';
 import { v4 as uuidv4 } from 'uuid';
+import { Button, Modal, Form } from 'react-bootstrap';
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,15 @@ const ManageProducts = () => {
     description: '',
     image: null,
   });
+  const [editFormData, setEditFormData] = useState({
+    id: '',
+    name: '',
+    price: '',
+    description: '',
+    image: null,
+  });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [refresh, setRefresh] = useState(false); // State variable to trigger useEffect
 
   useEffect(() => {
     fetchProducts().then(products => {
@@ -17,7 +27,7 @@ const ManageProducts = () => {
     }).catch(error => {
       console.error('Error:', error);
     });
-  }, []);
+  }, [refresh]); // Add refresh as a dependency
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -77,6 +87,104 @@ const ManageProducts = () => {
       }
     };
     fileReader.readAsDataURL(formData.image);
+  };
+
+  const handleEditProduct = (product) => {
+    setEditFormData({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      image: product.image,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData({ ...editFormData, [name]: value });
+  };
+
+  const handleEditFileChange = (e) => {
+    const file = e.target.files[0];
+    setEditFormData({ ...editFormData, image: file });
+  };
+
+  const handleUpdateProduct = async () => {
+    if (!editFormData.name || !editFormData.price || !editFormData.description) {
+      alert('All fields are required.');
+      return;
+    }
+
+    const fileReader = new FileReader();
+    fileReader.onload = async () => {
+      const imageData = fileReader.result;
+
+      const formDataToSend = {
+        name: editFormData.name,
+        price: editFormData.price,
+        description: editFormData.description,
+        images: [imageData], // Send image as base64 string in an array
+      };
+
+      try {
+        const response = await fetch(`/api/api/products/${editFormData.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formDataToSend),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update product');
+        } else alert(`Product ${editFormData.name} updated successfully`);
+
+        const updatedProduct = await response.json();
+        setProducts(products.map(product => product.id === updatedProduct.id ? updatedProduct : product));
+        setShowEditModal(false);
+        setRefresh(!refresh); // Trigger useEffect to fetch updated products
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update product');
+      }
+    };
+    if (editFormData.image instanceof File) {
+      fileReader.readAsDataURL(editFormData.image);
+    } else {
+      handleUpdateProductWithoutImage();
+    }
+  };
+
+  const handleUpdateProductWithoutImage = async () => {
+    const formDataToSend = {
+      name: editFormData.name,
+      price: editFormData.price,
+      description: editFormData.description,
+      images: [editFormData.image], // Use existing image
+    };
+
+    try {
+      const response = await fetch(`/api/api/products/${editFormData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formDataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      } else alert(`Product ${editFormData.name} updated successfully`);
+
+      const updatedProduct = await response.json();
+      setProducts(products.map(product => product.id === updatedProduct.id ? updatedProduct : product));
+      setShowEditModal(false);
+      setRefresh(!refresh); // Trigger useEffect to fetch updated products
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to update product');
+    }
   };
 
   const handleDeleteProduct = async (id) => {
@@ -177,17 +285,79 @@ const ManageProducts = () => {
                   <p className="mb-0">Price: ${product.price}</p>
                   <p className="mb-0">{product.description}</p>
                 </div>
-                <button
-                  className="btn btn-danger ms-auto"
-                  onClick={() => handleDeleteProduct(product.id)}
-                >
-                  Delete
-                </button>
+                <div className='ms-auto'>
+                  <button
+                    className="btn btn-warning me-2"
+                    onClick={() => handleEditProduct(product)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteProduct(product.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {/* Edit Product Modal */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={editFormData.name}
+                onChange={handleEditInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Price</Form.Label>
+              <Form.Control
+                type="number"
+                name="price"
+                value={editFormData.price}
+                onChange={handleEditInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                name="description"
+                value={editFormData.description}
+                onChange={handleEditInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Image</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={handleEditFileChange}
+                accept="image/*"
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdateProduct}>
+            Update Product
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
