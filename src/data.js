@@ -1,6 +1,7 @@
 const fetchProducts = async () => {
   try {
-    const response = await fetch('/api/api/products');
+    const baseUrl = import.meta.env.VITE_NYDIVA_BACKEND || '/api';
+    const response = await fetch(`${baseUrl}/api/products`);
     const data = await response.json();
     return data.map(product => ({
       id: product._id,

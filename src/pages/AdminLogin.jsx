@@ -11,7 +11,8 @@ const AdminLogin = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/api/auth/admin/login', {
+      const baseUrl = import.meta.env.VITE_NYDIVA_BACKEND || '/api';
+      const response = await fetch(`${baseUrl}/api/auth/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

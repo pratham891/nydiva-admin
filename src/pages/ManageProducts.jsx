@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Button, Modal, Form } from 'react-bootstrap';
 
 const ManageProducts = () => {
+  const baseUrl = import.meta.env.VITE_NYDIVA_BACKEND || '/api';
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -66,7 +67,7 @@ const ManageProducts = () => {
       };
 
       try {
-        const response = await fetch('/api/api/products', {
+        const response = await fetch(`${baseUrl}/api/products`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ const ManageProducts = () => {
       };
 
       try {
-        const response = await fetch(`/api/api/products/${editFormData.id}`, {
+        const response = await fetch(`${baseUrl}/api/products/${editFormData.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -165,7 +166,7 @@ const ManageProducts = () => {
     };
 
     try {
-      const response = await fetch(`/api/api/products/${editFormData.id}`, {
+      const response = await fetch(`${baseUrl}/api/products/${editFormData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -189,7 +190,7 @@ const ManageProducts = () => {
 
   const handleDeleteProduct = async (id) => {
     try {
-      const response = await fetch(`/api/api/products/${id}`, {
+      const response = await fetch(`${baseUrl}/api/products/${id}`, {
         method: 'DELETE',
       });
 

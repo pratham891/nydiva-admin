@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 
 const Orders = () => {
+  const baseUrl = import.meta.env.VITE_NYDIVA_BACKEND || '/api';
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -20,7 +21,7 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/api/orders');
+      const response = await fetch(`${baseUrl}/api/orders`);
       const data = await response.json();
       setOrders(data);
     } catch (error) {
@@ -41,7 +42,7 @@ const Orders = () => {
 
   const handleStatusChange = async () => {
     try {
-      const response = await fetch(`/api/api/orders/${selectedOrder._id}`, {
+      const response = await fetch(`${baseUrl}/api/orders/${selectedOrder._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
